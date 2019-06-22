@@ -9,7 +9,7 @@
           <el-input v-model="userForm.mobile" placeholder="请输入手机"></el-input>
         </el-form-item>
         <el-row :gutter="20">
-          <el-col :span="15" prop="code"><el-input v-model="userForm.code" placeholder="请输入验证码"></el-input></el-col>
+          <el-col :span="15" prop="code"><el-input v-model="userForm.code" placeholder="请输入验证码" ></el-input></el-col>
           <el-col :span="8"><el-button type="primary" plain @click="handleCheck">发送验证码</el-button></el-col>
         </el-row>
         <el-row :gutter="20">
@@ -44,7 +44,7 @@ export default {
     }
   },
   methods: {
-    handleCheck (event) {
+    handleCheck (e) {
       // 发送验证码
       const mobile = this.userForm.mobile
       axios({
@@ -58,12 +58,26 @@ export default {
           offline: !res.data.data.success,
           new_captcha: res.data.data.new_captcha,
           product: 'bind'
-        }, function (captchaObj) {
+        },
+        function (captchaObj) {
           // 这里可以调用验证实例 captchaObj 的实例方法
           captchaObj.onReady(function () {
-          // 验证码ready之后才能调用verify方法显示验证码
-            captchaObj.verify()
+            if (e.target.innerText === '发送验证码') {
+              // 停止倒计时才能弹出动态验证
+              // 验证码ready之后才能调用verify方法显示验证码
+              captchaObj.verify()
+            }
           }).onSuccess(function () {
+            let totalTime = 60
+            let timer = setInterval(function () {
+              if (totalTime > 0) {
+                totalTime--
+                e.target.innerText = totalTime + '秒后重新发送'
+              } else if (totalTime < 1) {
+                clearInterval(timer)
+                e.target.innerText = '发送验证码'
+              }
+            }, 1000)
             const {
               geetest_challenge: challenge,
               geetest_seccode: seccode,
