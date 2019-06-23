@@ -130,7 +130,9 @@ export default {
         method: 'POST',
         url: 'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
         data: this.userForm
-      }).then(() => {
+      }).then((res) => {
+        // 本地存储数据
+        window.localStorage.setItem('user_info', JSON.stringify(res.data.data))
         this.$message({
           message: '恭喜你，登录成功',
           type: 'success'
