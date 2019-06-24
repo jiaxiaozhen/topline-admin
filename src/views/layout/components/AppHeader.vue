@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { removeUser } from '@/utils/auth'
 export default {
   name: 'AppAside',
   data () {
@@ -48,8 +49,9 @@ export default {
           type: 'success',
           message: '退出成功!'
         })
-        window.localStorage.removeItem('user_info')
-        this.$router.push({ name: 'login' })
+        // window.localStorage.removeItem('user_info')
+        removeUser()
+        // this.$router.push({ name: 'login' })
       }).catch(() => {
         this.$message({
           type: 'info',

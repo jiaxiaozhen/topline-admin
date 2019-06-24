@@ -28,7 +28,7 @@
 
 <script>
 import axios from 'axios'
-
+import { setUser } from '@/utils/auth'
 // 引入极验
 import '@/vendor/gt.js'
 export default {
@@ -132,7 +132,8 @@ export default {
         data: this.userForm
       }).then((res) => {
         // 本地存储数据
-        window.localStorage.setItem('user_info', JSON.stringify(res.data.data))
+        // window.localStorage.setItem('user_info', JSON.stringify(res.data.data))
+        setUser(res.data.data) //
         this.$message({
           message: '恭喜你，登录成功',
           type: 'success'
