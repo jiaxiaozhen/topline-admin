@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { setUser } from '@/utils/auth'
 // 引入极验
 import '@/vendor/gt.js'
@@ -73,9 +72,9 @@ export default {
     handleCheck () {
       // 发送验证码
       const mobile = this.userForm.mobile
-      axios({
+      this.$http({
         method: 'GET',
-        url: `http://ttapi.research.itcast.cn/mp/v1_0/captchas/${mobile}`
+        url: `/captchas/${mobile}`
       }).then(res => {
         window.initGeetest({
           // 以下配置参数来自服务端 SDK
@@ -96,9 +95,9 @@ export default {
               geetest_seccode: seccode,
               geetest_validate: validate
             } = captchaObj.getValidate()
-            axios({
+            this.$http({
               method: 'GET',
-              url: `http://ttapi.research.itcast.cn/mp/v1_0/sms/codes/${mobile}`,
+              url: `/sms/codes/${mobile}`,
               params: {
                 challenge,
                 validate,
@@ -126,9 +125,9 @@ export default {
     },
     checkeLogin () {
       // 登录请求
-      axios({
+      this.$http({
         method: 'POST',
-        url: 'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
+        url: '/authorizations',
         data: this.userForm
       }).then((res) => {
         // 本地存储数据
