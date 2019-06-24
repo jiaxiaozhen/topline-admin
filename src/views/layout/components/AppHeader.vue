@@ -51,7 +51,7 @@ export default {
         })
         // window.localStorage.removeItem('user_info')
         removeUser()
-        // this.$router.push({ name: 'login' })
+        this.$router.push({ name: 'login' })
       }).catch(() => {
         this.$message({
           type: 'info',

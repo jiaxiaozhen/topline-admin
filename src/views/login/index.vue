@@ -27,8 +27,11 @@
 </template>
 
 <script>
+// 引入封装好的极验的promise
+import initGeetest from '@/utils/init-geetest'
+// 引入封装的本地存储用户信息模块
 import { setUser } from '@/utils/auth'
-// 引入极验
+// 引入极验js库
 import '@/vendor/gt.js'
 export default {
   data () {
@@ -69,48 +72,42 @@ export default {
       })
     },
 
-    handleCheck () {
+    async handleCheck () {
       // 发送验证码
       const mobile = this.userForm.mobile
-      this.$http({
+      const res = await this.$http({
         method: 'GET',
         url: `/captchas/${mobile}`
-      }).then(res => {
-        window.initGeetest({
-          // 以下配置参数来自服务端 SDK
-          gt: res.data.data.gt,
-          challenge: res.data.data.challenge,
-          offline: !res.data.data.success,
-          new_captcha: res.data.data.new_captcha,
-          product: 'bind'
-        },
-        (captchaObj) => {
-          // 这里可以调用验证实例 captchaObj 的实例方法
-          captchaObj.onReady(() => {
-            // 验证码ready之后才能调用verify方法显示验证码
-            captchaObj.verify()
-          }).onSuccess(() => {
-            const {
-              geetest_challenge: challenge,
-              geetest_seccode: seccode,
-              geetest_validate: validate
-            } = captchaObj.getValidate()
-            this.$http({
-              method: 'GET',
-              url: `/sms/codes/${mobile}`,
-              params: {
-                challenge,
-                validate,
-                seccode
-              }
-            }).then(res => {
-              console.log(res.data)
-              this.timeCount()
-            })
-          }).onError(function () {
-
-          })
+      })
+      const captchaObj = await initGeetest({
+        // 以下配置参数来自服务端 SDK
+        gt: res.data.data.gt,
+        challenge: res.data.data.challenge,
+        offline: !res.data.data.success,
+        new_captcha: res.data.data.new_captcha,
+        product: 'bind'
+      })
+      // 这里可以调用验证实例 captchaObj 的实例方法
+      captchaObj.onReady(() => {
+        // 验证码ready之后才能调用verify方法显示验证码
+        captchaObj.verify()
+      }).onSuccess(async () => {
+        const {
+          geetest_challenge: challenge,
+          geetest_seccode: seccode,
+          geetest_validate: validate
+        } = captchaObj.getValidate()
+        await this.$http({
+          method: 'GET',
+          url: `/sms/codes/${mobile}`,
+          params: {
+            challenge,
+            validate,
+            seccode
+          }
         })
+        // 倒计时
+        this.timeCount()
       })
     },
     handleLogin () {
@@ -123,24 +120,25 @@ export default {
         }
       })
     },
-    checkeLogin () {
-      // 登录请求
-      this.$http({
-        method: 'POST',
-        url: '/authorizations',
-        data: this.userForm
-      }).then((res) => {
+    async checkeLogin () {
+      try {
+        // 登录请求
+        const res = await this.$http({
+          method: 'POST',
+          url: '/authorizations',
+          data: this.userForm
+        })
         // 本地存储数据
         // window.localStorage.setItem('user_info', JSON.stringify(res.data.data))
-        setUser(res.data.data) //
+        setUser(res.data.data)
         this.$message({
           message: '恭喜你，登录成功',
           type: 'success'
         })
         this.$router.push({ name: 'home' })
-      }).catch(() => {
+      } catch (error) {
         this.$message.error('登录失败，手机或验证码错误')
-      })
+      }
     },
     timeCount () {
       this.timer = setInterval(() => {
