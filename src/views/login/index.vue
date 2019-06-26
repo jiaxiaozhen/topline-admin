@@ -11,7 +11,7 @@
         <el-form-item prop="code">
           <el-row :gutter="20">
             <el-col :span="15"><el-input v-model="userForm.code" placeholder="请输入验证码" ></el-input></el-col>
-            <el-col :span="8"><el-button type="primary" plain @click="handleSubmitCheck" :disabled="!!timer">{{ tip }}</el-button></el-col>
+            <el-col :span="8"><el-button type="primary" plain @click="handleSubmitCheck" :disabled="!!timer" :loading="loadingCode">{{ tip }}</el-button></el-col>
           </el-row>
         </el-form-item>
         <el-form-item prop="checked">
@@ -19,7 +19,7 @@
             <span class="agree-text">我已阅读并同意<a href="#" class="blue">用户协议</a>和<a href="#" class="blue">隐私条款</a></span>
         </el-form-item>
         <el-row :gutter="20">
-          <el-col :span="20"><el-button type="primary" @click="handleLogin" class="loginBtn">登录</el-button></el-col>
+          <el-col :span="20"><el-button :loading="loadingLogin" type="primary" @click="handleLogin" class="loginBtn">登录</el-button></el-col>
         </el-row>
       </el-form>
     </div>
@@ -57,7 +57,9 @@ export default {
           { required: true, message: '请同意用户协议' },
           { pattern: /true/, message: '请同意用户协议' }
         ]
-      }
+      },
+      loadingLogin: false,
+      loadingCode: false
     }
   },
   methods: {
@@ -71,44 +73,60 @@ export default {
         }
       })
     },
-
     async handleCheck () {
-      // 发送验证码
-      const mobile = this.userForm.mobile
-      const res = await this.$http({
-        method: 'GET',
-        url: `/captchas/${mobile}`
-      })
-      const captchaObj = await initGeetest({
-        // 以下配置参数来自服务端 SDK
-        gt: res.data.data.gt,
-        challenge: res.data.data.challenge,
-        offline: !res.data.data.success,
-        new_captcha: res.data.data.new_captcha,
-        product: 'bind'
-      })
-      // 这里可以调用验证实例 captchaObj 的实例方法
-      captchaObj.onReady(() => {
-        // 验证码ready之后才能调用verify方法显示验证码
-        captchaObj.verify()
-      }).onSuccess(async () => {
-        const {
-          geetest_challenge: challenge,
-          geetest_seccode: seccode,
-          geetest_validate: validate
-        } = captchaObj.getValidate()
-        await this.$http({
+      try {
+        // 按钮加载中效果，禁止连续多次发送
+        this.loadingCode = true
+        // 发送验证码
+        const mobile = this.userForm.mobile
+        const res = await this.$http({
           method: 'GET',
-          url: `/sms/codes/${mobile}`,
-          params: {
-            challenge,
-            validate,
-            seccode
-          }
+          url: `/captchas/${mobile}`
         })
-        // 倒计时
-        this.timeCount()
-      })
+        const captchaObj = await initGeetest({
+          // 以下配置参数来自服务端 SDK
+          gt: res.gt,
+          challenge: res.challenge,
+          offline: !res.success,
+          new_captcha: res.new_captcha,
+          product: 'bind'
+        })
+        this.requestCode(captchaObj, mobile)
+      } catch (error) {
+        this.$message.error('获取验证码失败')
+        this.loadingCode = false
+      }
+    },
+    requestCode (captchaObj, mobile) {
+      try {
+        // 这里可以调用验证实例 captchaObj 的实例方法
+        captchaObj.onReady(() => {
+        // 验证码ready之后才能调用verify方法显示验证码
+          captchaObj.verify()
+          // 加载中效果解开
+          this.loadingCode = true
+        }).onSuccess(async () => {
+          const {
+            geetest_challenge: challenge,
+            geetest_seccode: seccode,
+            geetest_validate: validate
+          } = captchaObj.getValidate()
+          await this.$http({
+            method: 'GET',
+            url: `/sms/codes/${mobile}`,
+            params: {
+              challenge,
+              validate,
+              seccode
+            }
+          })
+          // 倒计时
+          this.timeCount()
+        })
+      } catch (error) {
+        this.$message.error('获取验证码失败')
+        this.loadingCode = false
+      }
     },
     handleLogin () {
       // 登陆前，验证整个表单
@@ -121,6 +139,8 @@ export default {
       })
     },
     async checkeLogin () {
+      // 按钮加载效果
+      this.loading = true
       try {
         // 登录请求
         const res = await this.$http({
@@ -128,9 +148,10 @@ export default {
           url: '/authorizations',
           data: this.userForm
         })
+
         // 本地存储数据
         // window.localStorage.setItem('user_info', JSON.stringify(res.data.data))
-        setUser(res.data.data)
+        setUser(res)
         this.$message({
           message: '恭喜你，登录成功',
           type: 'success'
@@ -139,6 +160,7 @@ export default {
       } catch (error) {
         this.$message.error('登录失败，手机或验证码错误')
       }
+      this.loading = false
     },
     timeCount () {
       this.timer = setInterval(() => {
@@ -155,7 +177,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .login-wrap {
   height: 100%;
   background: url(./login_bg.jpg) no-repeat;

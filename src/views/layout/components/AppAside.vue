@@ -9,7 +9,8 @@
       @close="handleClose"
       background-color="rgb(53, 59, 78)"
       text-color="#fff"
-      active-text-color="#ffd04b">
+      active-text-color="#ffd04b"
+      :router="true">
       <el-menu-item index="/">
         <i class="el-icon-menu"></i>
         <span slot="title">首页</span>
@@ -21,7 +22,7 @@
         </template>
         <el-menu-item-group>
           <el-menu-item index="2-1">发布文章</el-menu-item>
-          <el-menu-item index="2-2">内容列表</el-menu-item>
+          <el-menu-item index="/article">内容列表</el-menu-item>
           <el-menu-item index="2-3">评论列表</el-menu-item>
           <el-menu-item index="2-4">素材管理</el-menu-item>
         </el-menu-item-group>
@@ -65,7 +66,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .aside-wrap{
   height: 100%;
   background: #303133;

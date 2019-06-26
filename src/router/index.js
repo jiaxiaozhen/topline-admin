@@ -16,8 +16,13 @@ const router = new Router({
         },
         {
           name: 'publish',
-          path: 'publish',
+          path: '/publish',
           component: () => import('@/views/publish')
+        },
+        {
+          name: 'article',
+          path: '/article',
+          component: () => import('@/views/article')
         }
       ]
     },
@@ -28,6 +33,8 @@ const router = new Router({
     }
   ]
 })
+
+// 全局前置守卫
 router.beforeEach((to, from, next) => {
   Nprogress.start()
   const userInfo = getUser()
@@ -35,6 +42,9 @@ router.beforeEach((to, from, next) => {
     if (userInfo) {
       next()
     } else {
+      if (from.path === '/login') {
+        Nprogress.done()
+      }
       next({
         path: '/login'
       })
@@ -47,6 +57,8 @@ router.beforeEach((to, from, next) => {
     }
   }
 })
+
+// 全局后置钩子
 router.afterEach((to, from) => {
   Nprogress.done()
 })
