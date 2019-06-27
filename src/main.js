@@ -7,12 +7,29 @@ import router from './router'
 import 'nprogress/nprogress.css'
 import axios from 'axios'
 import { getUser, removeUser } from '@/utils/auth'
+import JSONbig from 'json-bigint'
 
 // 配置 axios 的基础路径
 // 发请求的时候就不需要每次都写 http://xxxx
 // 例如我要请求登录，直接 axios({ url: '/authorizations' })
 // 路径最后的 /，多退少补
-axios.defaults.baseURL = 'http://toutiao.course.itcast.cn/mp/v1_0'
+axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0'
+// 如何解决后端返回数据中的数字超出安全整数范围问题？
+// 可以理解成也是一个响应拦截器，这个比较特殊。这里的 data 是后端返回的未经处理的原始数据
+// axios 默认使用 JONS.parse 去转换原始数据，如果其中有超出安全整数范围的数据就有问题了，所以我们在这里可以手动处理这个原始数据
+//   npm i json-biginit
+//   JSONbig.parse(原始json格式字符串)
+// 配置处理axios返回的结果（axios 预留的自定义处理后端返回的原始数据）
+axios.defaults.transformResponse = [function (data) {
+  // Do whatever you want to transform the data
+  try {
+    // 如果是json数据
+    return JSONbig.parse(data)
+  } catch (err) {
+    // 如果不是json数据
+    return data
+  }
+}]
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {

@@ -11,6 +11,8 @@
       text-color="#fff"
       active-text-color="#ffd04b"
       :router="true">
+      <!-- 用来绑定路由配置表 -->
+      <!-- 是否使用 vue-router 的模式，启用该模式会在激活导航时以 index 作为 path 进行路由跳转 -->
       <el-menu-item index="/">
         <i class="el-icon-menu"></i>
         <span slot="title">首页</span>
@@ -21,7 +23,7 @@
           <span>内容管理</span>
         </template>
         <el-menu-item-group>
-          <el-menu-item index="2-1">发布文章</el-menu-item>
+          <el-menu-item index="/publish">发布文章</el-menu-item>
           <el-menu-item index="/article">内容列表</el-menu-item>
           <el-menu-item index="2-3">评论列表</el-menu-item>
           <el-menu-item index="2-4">素材管理</el-menu-item>

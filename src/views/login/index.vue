@@ -104,7 +104,7 @@ export default {
         // 验证码ready之后才能调用verify方法显示验证码
           captchaObj.verify()
           // 加载中效果解开
-          this.loadingCode = true
+          this.loadingCode = false
         }).onSuccess(async () => {
           const {
             geetest_challenge: challenge,
