@@ -57,6 +57,7 @@ export default {
           method: 'GET',
           url: '/user/profile'
         })
+        data.id = data.id.toString()
         this.user = data
       } catch (err) {
         console.log(err)
@@ -73,6 +74,7 @@ export default {
           data: formData
         })
         this.user.photo = data.photo
+        // 提交头像信息到store中
         this.$store.commit('changeUser', this.user)
       } catch (err) {
         console.log(err)
@@ -80,10 +82,8 @@ export default {
       }
     },
     async handleSaveUser () {
-      console.log(123)
       try {
         const { name, intro, email } = this.user
-        console.log(3)
         const data = await this.$http({
           method: 'PATCH',
           url: '/user/profile',
@@ -97,7 +97,7 @@ export default {
           type: 'success',
           message: '保存修改成功'
         })
-        // 提交 mutation，也就是调用 mutation 函数
+        // 提交 mutation，也就是调用 mutation 函数，第二个参数是传到store中的数据
         this.$store.commit('changeUser', data)
       } catch (err) {
         console.log(err)
@@ -109,30 +109,29 @@ export default {
 }
 </script>
 <style>
-
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
 </style>
 <style lang="less" scoped>
-.avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
-  }
 </style>
