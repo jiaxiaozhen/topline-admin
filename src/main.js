@@ -8,6 +8,8 @@ import 'nprogress/nprogress.css'
 import axios from 'axios'
 import { getUser, removeUser } from '@/utils/auth'
 import JSONbig from 'json-bigint'
+// 引入vuex
+import store from './store'
 
 // 配置 axios 的基础路径
 // 发请求的时候就不需要每次都写 http://xxxx
@@ -72,5 +74,6 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

@@ -77,7 +77,10 @@
         <el-table-column
           label="操作">
           <template slot-scope="scope">
-            <el-button size="small" type="primary">编辑</el-button>
+            <el-button size="small"
+             type="primary"
+             @click="$router.push(`/publish/${scope.row.id}`)"
+             >编辑</el-button>
             <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>

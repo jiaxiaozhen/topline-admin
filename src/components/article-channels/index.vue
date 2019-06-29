@@ -1,6 +1,7 @@
 <template>
   <el-select :value="value"
-  @change="handleChange">
+  @change="handleChange"
+  clearable>
     <el-option
     v-for="item in channels"
     :key="item.id"

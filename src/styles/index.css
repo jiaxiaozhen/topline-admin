@@ -6,3 +6,6 @@ html,
 body {
   height: 100%;
 }
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF !important;
+}

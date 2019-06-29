@@ -8,7 +8,10 @@
         <el-input v-model="publishForm.title" placeholder="文章名称"></el-input>
       </el-form-item>
       <el-form-item label="内容">
-        <el-input type="textarea" v-model="publishForm.content"></el-input>
+        <!-- bidirectional data binding（双向数据绑定） -->
+        <quill-editor v-model="publishForm.content"
+          style="height=500px">
+        </quill-editor>
       </el-form-item>
       <el-form-item label="封面">
         <el-radio-group>
@@ -30,11 +33,18 @@
 </template>
 
 <script>
+// 富文本编辑器
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+import { quillEditor } from 'vue-quill-editor'
+// 频道列表组件
 import articleChannels from '@/components/article-channels'
 export default {
   name: 'publish',
   components: {
-    articleChannels
+    articleChannels,
+    quillEditor
   },
   data () {
     return {
@@ -45,33 +55,74 @@ export default {
           type: 0,
           images: []
         },
-        channel_id: 3
+        channel_id: ''
       }
+    }
+  },
+  created () {
+    if (this.$route.name === 'publish-edit') {
+      this.loadArticle()
     }
   },
   methods: {
     async handlePublish (draft) {
       try {
-        await this.$http({
-          method: 'POST',
-          url: '/articles',
-          params: {
-            draft
-          },
-          data: this.publishForm
-        })
-        this.$message({
-          type: 'success',
-          message: '文章发布成功'
-        })
-        this.$router.push({ name: 'article' })
+        // 发表文章
+        if (this.$route.name === 'publish') {
+          await this.$http({
+            method: 'POST',
+            url: '/articles',
+            params: {
+              draft
+            },
+            data: this.publishForm
+          })
+          this.$message({
+            type: 'success',
+            message: '文章发布成功'
+          })
+          this.$router.push({ name: 'article' })
+        } else {
+          // 修改文章
+          await this.$http({
+            method: 'PUT',
+            url: `/articles/${this.$route.params.id}`,
+            params: {
+              draft
+            },
+            data: this.publishForm
+          })
+          this.$message({
+            type: 'success',
+            message: '修改文章成功'
+          })
+          this.$router.push({ name: 'article' })
+        }
       } catch (err) {
-        this.$message.error('文章发布失败', err)
+        this.$message.error('操作失败', err)
+      }
+    },
+    async loadArticle () {
+      try {
+        const data = await this.$http({
+          method: 'GET',
+          url: `/articles/${this.$route.params.id}`
+        })
+        this.publishForm = data
+      } catch (err) {
+        console.log(err)
+        this.$message.error('获取该文章失败')
       }
     }
   }
 }
 </script>
 
+<style>
+.ql-editor, .ql-blank{
+height: 300px ;
+}
+</style>
 <style lang="less" scoped>
+
 </style>

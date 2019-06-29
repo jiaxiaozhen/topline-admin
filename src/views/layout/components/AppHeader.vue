@@ -10,8 +10,8 @@
         <div class="grid-content bg-purple">
           <el-dropdown trigger="click">
             <span class="el-dropdown-link">
-              <img width="40px" :src="userInfo.photo">
-              {{userInfo.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+              <img width="40px" :src="$store.state.user.photo">
+              {{$store.state.user.name}}<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>个人信息</el-dropdown-item>
@@ -35,8 +35,6 @@ export default {
     }
   },
   created () {
-    this.userInfo = JSON.parse(window.localStorage.getItem('user_info'))
-    console.log(this.userInfo)
   },
   methods: {
     handleLogout () {
