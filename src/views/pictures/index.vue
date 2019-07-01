@@ -7,7 +7,16 @@
   <el-button type="primary" plain size="small" @click="handleGet(false)">全部</el-button>
   <el-button type="primary" plain size="small" @click="handleGet(true)">收藏</el-button>
  </el-button-group>
- <el-button type="primary" class="uptade">上传图片</el-button>
+ <el-upload
+  class="upload-demo"
+  action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+  :headers="{Authorization :`Bearer ${$store.state.user.token}`}"
+  name="image"
+  :on-success="uploadImg"
+  :show-file-list="false"
+  >
+  <el-button size="small" type="primary">点击上传</el-button>
+</el-upload>
  <div class="img-list">
     <div
      class="item-images block"
@@ -129,6 +138,9 @@ export default {
         console.log(err)
         this.$message.error('删除图片失败')
       }
+    },
+    uploadImg () {
+      this.loadImages()
     }
 
   }
@@ -136,14 +148,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .uptade {
+  .upload-demo {
       float: right;
   }
   .img-list{
       overflow: hidden;
       .item-images {
       float: left;
-      margin: 20px 30px;
+      margin: 20px 30px 20px 25px;
       .img {
           width: 150px;
       height: 140px;

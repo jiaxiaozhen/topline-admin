@@ -14,12 +14,19 @@
         </quill-editor>
       </el-form-item>
       <el-form-item label="封面">
-        <el-radio-group>
-          <el-radio label="单图"></el-radio>
-          <el-radio label="三图"></el-radio>
-          <el-radio label="无图"></el-radio>
-          <el-radio label="自动"></el-radio>
+        <el-radio-group v-model="publishForm.cover.type">
+          <el-radio :label="1">单图</el-radio>
+          <el-radio :label="3">三图</el-radio>
+          <el-radio :label="0">无图</el-radio>
+          <el-radio :label="-1">自动</el-radio>
         </el-radio-group>
+        <template v-if="publishForm.cover.type>0">
+          <el-row>
+            <el-col :span="6" v-for="n in publishForm.cover.type" :key="n">
+              <upload-img v-model="publishForm.cover.images[n-1]"></upload-img>
+            </el-col>
+          </el-row>
+        </template>
       </el-form-item>
       <el-form-item label="频道">
         <article-channels v-model="publishForm.channel_id"></article-channels>
@@ -33,6 +40,8 @@
 </template>
 
 <script>
+// 引入图片上传组件
+import uploadImg from './components/upload-img'
 // 富文本编辑器
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
@@ -44,7 +53,8 @@ export default {
   name: 'publish',
   components: {
     articleChannels,
-    quillEditor
+    quillEditor,
+    uploadImg
   },
   data () {
     return {
@@ -52,7 +62,7 @@ export default {
         title: '',
         content: '',
         cover: {
-          type: 0,
+          type: 1,
           images: []
         },
         channel_id: ''

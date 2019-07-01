@@ -8,7 +8,8 @@
         <AppHeader></AppHeader>
       </el-header>
       <el-main>
-        <router-view></router-view>
+        <!-- 禁用路由缓存 -->
+        <router-view :key="$route.path"></router-view>
       </el-main>
     </el-container>
   </el-container>
